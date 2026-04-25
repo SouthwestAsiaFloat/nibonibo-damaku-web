@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { login as mockLogin, register as mockRegister } from '../api/user'
+import { getMe, login as apiLogin, register as apiRegister } from '../api/user'
 import type { LoginForm, RegisterForm, User } from '../types/user'
 
 const TOKEN_KEY = 'nibonibo_token'
@@ -34,15 +34,26 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function login(payload: LoginForm) {
-    const result = await mockLogin(payload)
+    const result = await apiLogin(payload)
     persist(result.token, result.user)
     return result.user
   }
 
   async function register(payload: RegisterForm) {
-    const result = await mockRegister(payload)
+    const result = await apiRegister(payload)
     persist(result.token, result.user)
     return result.user
+  }
+
+  async function refreshCurrentUser() {
+    if (!token.value) {
+      return null
+    }
+
+    const user = await getMe()
+    currentUser.value = user
+    localStorage.setItem(USER_KEY, JSON.stringify(user))
+    return user
   }
 
   function logout() {
@@ -58,6 +69,7 @@ export const useUserStore = defineStore('user', () => {
     isLoggedIn,
     login,
     register,
+    refreshCurrentUser,
     logout,
   }
 })

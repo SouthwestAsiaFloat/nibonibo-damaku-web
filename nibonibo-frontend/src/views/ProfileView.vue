@@ -40,14 +40,16 @@ onMounted(async () => {
     <el-skeleton v-if="loading" :rows="10" animated />
     <el-tabs v-else class="profile-tabs" type="border-card">
       <el-tab-pane label="我发布的视频">
-        <div class="video-grid">
+        <div v-if="publishedVideos.length" class="video-grid">
           <VideoCard v-for="video in publishedVideos" :key="video.id" :video="video" />
         </div>
+        <el-empty v-else description="你还没有发布视频，去投稿页试试" />
       </el-tab-pane>
       <el-tab-pane label="我的收藏">
-        <div class="video-grid">
+        <div v-if="collectedVideos.length" class="video-grid">
           <VideoCard v-for="video in collectedVideos" :key="video.id" :video="video" />
         </div>
+        <el-empty v-else description="还没有收藏视频" />
       </el-tab-pane>
     </el-tabs>
   </div>

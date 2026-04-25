@@ -10,7 +10,7 @@ export const mockVideos: Video[] = [
     coverUrl: 'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=80',
     videoUrl: flowerVideo,
     up: {
-      id: 11,
+      id: '11',
       nickname: '代码会发光',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=light-code',
     },
@@ -29,7 +29,7 @@ export const mockVideos: Video[] = [
     coverUrl: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80',
     videoUrl: flowerVideo,
     up: {
-      id: 12,
+      id: '12',
       nickname: '前端小圆桌',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=round-table',
     },
@@ -48,7 +48,7 @@ export const mockVideos: Video[] = [
     coverUrl: 'https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=900&q=80',
     videoUrl: flowerVideo,
     up: {
-      id: 13,
+      id: '13',
       nickname: '咕噜厨房',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=kitchen',
     },
@@ -67,7 +67,7 @@ export const mockVideos: Video[] = [
     coverUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=900&q=80',
     videoUrl: flowerVideo,
     up: {
-      id: 14,
+      id: '14',
       nickname: '螺丝刀电台',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=repair',
     },
@@ -86,7 +86,7 @@ export const mockVideos: Video[] = [
     coverUrl: 'https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?auto=format&fit=crop&w=900&q=80',
     videoUrl: flowerVideo,
     up: {
-      id: 15,
+      id: '15',
       nickname: '慢速取景器',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=city-walk',
     },
@@ -105,7 +105,7 @@ export const mockVideos: Video[] = [
     coverUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80',
     videoUrl: flowerVideo,
     up: {
-      id: 16,
+      id: '16',
       nickname: '组件搬运猫',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=component-cat',
     },
@@ -124,7 +124,7 @@ export const mockVideos: Video[] = [
     coverUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=80',
     videoUrl: flowerVideo,
     up: {
-      id: 17,
+      id: '17',
       nickname: '高能预警站',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=danmaku',
     },
@@ -143,7 +143,7 @@ export const mockVideos: Video[] = [
     coverUrl: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=900&q=80',
     videoUrl: flowerVideo,
     up: {
-      id: 18,
+      id: '18',
       nickname: '版式研究所',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=layout',
     },

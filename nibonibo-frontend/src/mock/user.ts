@@ -2,7 +2,7 @@ import type { User } from '../types/user'
 import type { Video } from '../types/video'
 
 export const mockUser: User = {
-  id: 1001,
+  id: '1001',
   username: 'nibo_user',
   nickname: '妮啵放映员',
   avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=nibonibo',

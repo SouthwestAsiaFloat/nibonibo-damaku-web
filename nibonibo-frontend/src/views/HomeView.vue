@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import VideoCard from '../components/VideoCard.vue'
 import { getVideoList } from '../api/video'
@@ -10,22 +10,16 @@ const videos = ref<Video[]>([])
 const loading = ref(true)
 
 const keyword = computed(() => (typeof route.query.keyword === 'string' ? route.query.keyword.trim() : ''))
-const filteredVideos = computed(() => {
-  const query = keyword.value.toLowerCase()
-
-  if (!query) {
-    return videos.value
-  }
-
-  return videos.value.filter((video) => {
-    return [video.title, video.description, video.up.nickname, ...video.tags]
-      .join(' ')
-      .toLowerCase()
-      .includes(query)
-  })
-})
-
 const totalPlays = computed(() => videos.value.reduce((sum, video) => sum + video.playCount, 0))
+
+async function loadVideos() {
+  loading.value = true
+  try {
+    videos.value = await getVideoList(keyword.value)
+  } finally {
+    loading.value = false
+  }
+}
 
 function formatNumber(value: number) {
   if (value >= 10000) {
@@ -35,32 +29,30 @@ function formatNumber(value: number) {
   return String(value)
 }
 
-onMounted(async () => {
-  videos.value = await getVideoList()
-  loading.value = false
-})
+watch(keyword, loadVideos)
+onMounted(loadVideos)
 </script>
 
 <template>
   <div class="home-view page-shell">
     <section class="hero panel-card">
       <div class="hero-copy">
-        <span class="eyebrow">nibonibo-web MVP</span>
+        <span class="eyebrow">nibonibo 联调版</span>
         <h1>今天也在 <span class="nibo-gradient-text">蓝色弹幕海</span> 里相遇</h1>
         <p>
-          一个简化版的视频弹幕社区前端壳子：有首页瀑布流、登录注册、详情弹幕、投稿和个人中心。
+          首页视频、详情、评论和弹幕已经切到 Spring Boot 后端接口。没有数据时，可以登录后去投稿页发布第一支视频。
         </p>
         <div class="hero-actions">
-          <el-button type="primary" size="large" round>看看推荐</el-button>
-          <el-button size="large" round>本地 mock 数据</el-button>
+          <el-button type="primary" size="large" round>后端实时数据</el-button>
+          <el-button size="large" round>JWT + MySQL + MinIO</el-button>
         </div>
       </div>
 
       <div class="hero-card">
         <div class="hero-orbit"></div>
         <strong>{{ videos.length }}</strong>
-        <span>支精选视频</span>
-        <small>{{ formatNumber(totalPlays) }} 次播放在这里预热</small>
+        <span>支后端视频</span>
+        <small>{{ formatNumber(totalPlays) }} 次播放正在预热</small>
       </div>
     </section>
 
@@ -68,16 +60,16 @@ onMounted(async () => {
       <div class="section-title">
         <div>
           <h2>{{ keyword ? `搜索：${keyword}` : '推荐视频' }}</h2>
-          <p class="muted">像简化版 B 站一样浏览封面、标题、UP 主和互动数据。</p>
+          <p class="muted">数据来自 `GET /api/videos/page`，搜索会直接请求后端分页接口。</p>
         </div>
-        <el-tag effect="light" round>{{ filteredVideos.length }} 个结果</el-tag>
+        <el-tag effect="light" round>{{ videos.length }} 个结果</el-tag>
       </div>
 
       <el-skeleton v-if="loading" :rows="8" animated />
-      <div v-else-if="filteredVideos.length" class="video-grid">
-        <VideoCard v-for="video in filteredVideos" :key="video.id" :video="video" />
+      <div v-else-if="videos.length" class="video-grid">
+        <VideoCard v-for="video in videos" :key="video.id" :video="video" />
       </div>
-      <el-empty v-else description="没有找到相关视频，换个关键词试试" />
+      <el-empty v-else description="后端暂无视频，登录后去投稿页发布一支吧" />
     </section>
   </div>
 </template>

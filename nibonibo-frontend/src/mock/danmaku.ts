@@ -6,7 +6,7 @@ export const mockDanmaku: Record<string, Danmaku[]> = {
       id: 'd-1-1',
       videoId: '1',
       user: {
-        id: 301,
+        id: '301',
         nickname: '夜航模式',
         avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=night',
       },
@@ -19,7 +19,7 @@ export const mockDanmaku: Record<string, Danmaku[]> = {
       id: 'd-1-2',
       videoId: '1',
       user: {
-        id: 302,
+        id: '302',
         nickname: '像素企鹅',
         avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=pixel',
       },
@@ -34,7 +34,7 @@ export const mockDanmaku: Record<string, Danmaku[]> = {
       id: 'd-7-1',
       videoId: '7',
       user: {
-        id: 303,
+        id: '303',
         nickname: '弹幕同步率',
         avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=sync',
       },
@@ -51,7 +51,7 @@ export const fallbackDanmaku: Danmaku[] = [
     id: 'd-fallback-1',
     videoId: 'fallback',
     user: {
-      id: 304,
+      id: '304',
       nickname: '空降成功',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=landing',
     },
@@ -64,7 +64,7 @@ export const fallbackDanmaku: Danmaku[] = [
     id: 'd-fallback-2',
     videoId: 'fallback',
     user: {
-      id: 305,
+      id: '305',
       nickname: '一键三连',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=triple',
     },

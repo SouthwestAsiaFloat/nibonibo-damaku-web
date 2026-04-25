@@ -1,34 +1,53 @@
-import { mockUser } from '../mock/user'
-import type { AuthResult, LoginForm, RegisterForm } from '../types/user'
+import request from './request'
+import type { AuthResult, LoginForm, RegisterForm, User } from '../types/user'
 
-const wait = (ms = 260) => new Promise((resolve) => window.setTimeout(resolve, ms))
+interface BackendUserVO {
+  id: string
+  username: string
+  nickname: string
+  avatar?: string
+  bio?: string
+  token?: string
+}
+
+function toUser(vo: BackendUserVO): User {
+  return {
+    id: vo.id,
+    username: vo.username,
+    nickname: vo.nickname || vo.username,
+    avatar: vo.avatar || `https://api.dicebear.com/9.x/thumbs/svg?seed=${vo.username}`,
+    bio: vo.bio || '这个人很神秘，还没有写简介。',
+    followers: 0,
+    following: 0,
+  }
+}
 
 export async function login(payload: LoginForm): Promise<AuthResult> {
-  await wait()
+  const data = (await request.post('/users/login', {
+    username: payload.account,
+    password: payload.password,
+  })) as BackendUserVO
 
   return {
-    token: `mock-token-${Date.now()}`,
-    user: {
-      ...mockUser,
-      username: payload.account,
-      nickname: payload.account === 'nibo_user' ? mockUser.nickname : payload.account,
-    },
+    token: data.token || '',
+    user: toUser(data),
   }
 }
 
 export async function register(payload: RegisterForm): Promise<AuthResult> {
-  await wait()
+  const data = (await request.post('/users/register', {
+    username: payload.username,
+    password: payload.password,
+    nickname: payload.username,
+  })) as BackendUserVO
 
   return {
-    token: `mock-register-token-${Date.now()}`,
-    user: {
-      ...mockUser,
-      id: Date.now(),
-      username: payload.username,
-      nickname: payload.username,
-      bio: '刚刚加入 nibonibo，正在准备第一支投稿。',
-      followers: 0,
-      following: 0,
-    },
+    token: data.token || '',
+    user: toUser(data),
   }
+}
+
+export async function getMe(): Promise<User> {
+  const data = (await request.get('/users/me')) as BackendUserVO
+  return toUser(data)
 }

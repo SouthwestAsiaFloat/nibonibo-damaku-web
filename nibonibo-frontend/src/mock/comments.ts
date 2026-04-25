@@ -6,7 +6,7 @@ export const mockComments: Record<string, Comment[]> = {
       id: 'c-1-1',
       videoId: '1',
       user: {
-        id: 201,
+        id: '201',
         nickname: '蓝色汽水',
         avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=soda',
       },
@@ -18,7 +18,7 @@ export const mockComments: Record<string, Comment[]> = {
       id: 'c-1-2',
       videoId: '1',
       user: {
-        id: 202,
+        id: '202',
         nickname: '没睡醒的 CSS',
         avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=css',
       },
@@ -32,7 +32,7 @@ export const mockComments: Record<string, Comment[]> = {
       id: 'c-2-1',
       videoId: '2',
       user: {
-        id: 203,
+        id: '203',
         nickname: '路由守卫',
         avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=router',
       },
@@ -48,7 +48,7 @@ export const fallbackComments: Comment[] = [
     id: 'c-fallback-1',
     videoId: 'fallback',
     user: {
-      id: 204,
+      id: '204',
       nickname: '首页巡逻员',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=patrol',
     },
@@ -60,7 +60,7 @@ export const fallbackComments: Comment[] = [
     id: 'c-fallback-2',
     videoId: 'fallback',
     user: {
-      id: 205,
+      id: '205',
       nickname: '弹幕漂流瓶',
       avatar: 'https://api.dicebear.com/9.x/thumbs/svg?seed=bottle',
     },

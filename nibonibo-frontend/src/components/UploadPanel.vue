@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import type { UploadFile, UploadUserFile } from 'element-plus'
+import type { UploadFile, UploadRawFile, UploadUserFile } from 'element-plus'
+import { uploadImage, uploadVideo } from '../api/upload'
+import { createVideo } from '../api/video'
 
 const emit = defineEmits<{
   published: []
@@ -26,32 +28,53 @@ function keepLatestVideo(_file: UploadFile, files: UploadUserFile[]) {
   videoFiles.value = files.slice(-1)
 }
 
-function simulatePublish() {
+function rawFile(file?: UploadUserFile): File | undefined {
+  return file?.raw as UploadRawFile | undefined
+}
+
+async function publish() {
   if (!form.title.trim()) {
     ElMessage.warning('先给视频起一个标题吧')
     return
   }
 
-  if (!videoFiles.value.length) {
+  const videoRaw = rawFile(videoFiles.value[0])
+  if (!videoRaw) {
     ElMessage.warning('请选择一个视频文件')
     return
   }
 
   publishing.value = true
-  progress.value = 8
+  progress.value = 5
 
-  const timer = window.setInterval(() => {
-    progress.value = Math.min(100, progress.value + Math.ceil(Math.random() * 16))
+  try {
+    const coverRaw = rawFile(coverFiles.value[0])
+    const coverUrl = coverRaw
+      ? await uploadImage(coverRaw, (percent) => {
+          progress.value = Math.max(progress.value, Math.round(percent * 0.25))
+        })
+      : ''
 
-    if (progress.value >= 100) {
-      window.clearInterval(timer)
-      window.setTimeout(() => {
-        publishing.value = false
-        ElMessage.success('发布成功，这是前端模拟流程')
-        emit('published')
-      }, 300)
-    }
-  }, 220)
+    const videoUrl = await uploadVideo(videoRaw, (percent) => {
+      progress.value = Math.max(progress.value, 25 + Math.round(percent * 0.55))
+    })
+
+    progress.value = 88
+    await createVideo({
+      title: form.title.trim(),
+      description: form.description.trim(),
+      coverUrl,
+      videoUrl,
+      duration: 0,
+      categoryId: '1004',
+    })
+
+    progress.value = 100
+    ElMessage.success('发布成功，已写入后端视频表')
+    emit('published')
+  } finally {
+    publishing.value = false
+  }
 }
 </script>
 
@@ -74,7 +97,7 @@ function simulatePublish() {
       </el-form-item>
 
       <el-form-item label="标签">
-        <el-input v-model="form.tags" placeholder="例如：前端, Vue3, 生活" />
+        <el-input v-model="form.tags" placeholder="例如：前端, Vue3, 生活（后端暂未入库）" />
       </el-form-item>
 
       <div class="upload-grid">
@@ -91,7 +114,7 @@ function simulatePublish() {
           >
             <div class="upload-copy">
               <strong>拖拽封面到这里</strong>
-              <span>支持 jpg/png/webp，当前只做前端选择</span>
+              <span>会上传到后端 `/api/upload/image` 并写入 MinIO</span>
             </div>
           </el-upload>
         </el-form-item>
@@ -108,20 +131,20 @@ function simulatePublish() {
           >
             <div class="upload-copy">
               <strong>选择视频文件</strong>
-              <span>不会上传到服务器，只模拟进度条</span>
+              <span>会上传到后端 `/api/upload/video` 并创建视频记录</span>
             </div>
           </el-upload>
         </el-form-item>
       </div>
 
       <div v-if="publishing || progress > 0" class="progress-box">
-        <span>上传进度</span>
+        <span>上传 / 发布进度</span>
         <el-progress :percentage="progress" :stroke-width="12" striped striped-flow />
       </div>
 
       <div class="footer-actions">
-        <el-button size="large" @click="progress = 0">重置进度</el-button>
-        <el-button type="primary" size="large" :loading="publishing" @click="simulatePublish">
+        <el-button size="large" :disabled="publishing" @click="progress = 0">重置进度</el-button>
+        <el-button type="primary" size="large" :loading="publishing" @click="publish">
           发布视频
         </el-button>
       </div>

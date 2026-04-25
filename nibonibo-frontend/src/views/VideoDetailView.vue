@@ -5,7 +5,16 @@ import { ElMessage } from 'element-plus'
 import { Coin, Pointer, Star, UserFilled } from '@element-plus/icons-vue'
 import CommentList from '../components/CommentList.vue'
 import DanmakuPanel from '../components/DanmakuPanel.vue'
-import { getComments, getDanmaku, sendComment, sendDanmaku } from '../api/interaction'
+import {
+  favoriteVideo,
+  getComments,
+  getDanmaku,
+  likeVideo,
+  sendComment,
+  sendDanmaku,
+  unfavoriteVideo,
+  unlikeVideo,
+} from '../api/interaction'
 import { getVideoDetail } from '../api/video'
 import { useUserStore } from '../stores/user'
 import type { Comment as VideoComment } from '../types/comment'
@@ -28,25 +37,29 @@ const videoId = computed(() => String(route.params.id))
 
 async function loadVideo() {
   loading.value = true
-  const [detail, nextComments, nextDanmaku] = await Promise.all([
-    getVideoDetail(videoId.value),
-    getComments(videoId.value),
-    getDanmaku(videoId.value),
-  ])
 
-  if (!detail) {
-    ElMessage.error('视频不存在')
-    router.replace('/')
-    return
+  try {
+    const [detail, nextComments, nextDanmaku] = await Promise.all([
+      getVideoDetail(videoId.value),
+      getComments(videoId.value),
+      getDanmaku(videoId.value),
+    ])
+
+    if (!detail) {
+      ElMessage.error('视频不存在')
+      router.replace('/')
+      return
+    }
+
+    video.value = detail
+    comments.value = nextComments
+    danmakuList.value = nextDanmaku
+    liked.value = false
+    favored.value = false
+    coined.value = false
+  } finally {
+    loading.value = false
   }
-
-  video.value = detail
-  comments.value = nextComments
-  danmakuList.value = nextDanmaku
-  liked.value = false
-  favored.value = false
-  coined.value = false
-  loading.value = false
 }
 
 function requireLogin() {
@@ -62,22 +75,48 @@ function requireLogin() {
   return false
 }
 
-function toggleLike() {
+async function toggleLike() {
   if (!requireLogin() || !video.value) {
     return
   }
 
-  liked.value = !liked.value
-  video.value.likeCount += liked.value ? 1 : -1
+  const nextLiked = !liked.value
+  liked.value = nextLiked
+  video.value.likeCount += nextLiked ? 1 : -1
+
+  try {
+    if (nextLiked) {
+      await likeVideo(video.value.id)
+    } else {
+      await unlikeVideo(video.value.id)
+    }
+  } catch {
+    liked.value = !nextLiked
+    video.value.likeCount += nextLiked ? -1 : 1
+  }
 }
 
-function toggleFavorite() {
-  if (!requireLogin()) {
+async function toggleFavorite() {
+  if (!requireLogin() || !video.value) {
     return
   }
 
-  favored.value = !favored.value
-  ElMessage.success(favored.value ? '已收藏' : '已取消收藏')
+  const nextFavored = !favored.value
+  favored.value = nextFavored
+  video.value.favoriteCount += nextFavored ? 1 : -1
+
+  try {
+    if (nextFavored) {
+      await favoriteVideo(video.value.id)
+      ElMessage.success('已收藏')
+    } else {
+      await unfavoriteVideo(video.value.id)
+      ElMessage.success('已取消收藏')
+    }
+  } catch {
+    favored.value = !nextFavored
+    video.value.favoriteCount += nextFavored ? -1 : 1
+  }
 }
 
 function toggleCoin() {
@@ -87,6 +126,7 @@ function toggleCoin() {
 
   coined.value = !coined.value
   video.value.coinCount += coined.value ? 1 : -1
+  ElMessage.success(coined.value ? '已投币（前端临时态）' : '已取消投币（前端临时态）')
 }
 
 async function handleDanmakuSend(content: string) {
@@ -94,7 +134,7 @@ async function handleDanmakuSend(content: string) {
     return
   }
 
-  const item = await sendDanmaku(video.value.id, content, userStore.currentUser ?? undefined)
+  const item = await sendDanmaku(video.value.id, content)
   danmakuList.value = [...danmakuList.value, item]
 }
 
@@ -103,7 +143,7 @@ async function handleCommentSend(content: string) {
     return
   }
 
-  const item = await sendComment(video.value.id, content, userStore.currentUser ?? undefined)
+  const item = await sendComment(video.value.id, content)
   comments.value = [item, ...comments.value]
 }
 
@@ -181,7 +221,7 @@ onMounted(loadVideo)
                 UP 主
               </span>
               <strong>{{ video.up.nickname }}</strong>
-              <p>认真发布每一份喜欢，也欢迎在评论区一起补充灵感。</p>
+              <p>视频详情、评论和弹幕都来自后端接口；投币暂时保留为前端临时状态。</p>
             </div>
           </section>
 
